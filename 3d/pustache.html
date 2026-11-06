@@ -1,0 +1,102 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pustache Sorter – 3D model</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font:14px/1.4 Helvetica,Arial,sans-serif;color:#1c2b44;background:#dfe6ef;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+header{background:#0f1b2d;color:#fff;padding:10px 18px;display:flex;align-items:center;gap:14px;border-bottom:3px solid #ff7a00}
+header .num{background:#ff7a00;border-radius:50%;width:38px;height:38px;display:grid;place-items:center;font-weight:800}
+header h1{margin:0;font-size:18px;letter-spacing:.5px}header p{margin:0;font-size:12px;color:#9fb3cf}
+header a{margin-left:auto;color:#8ab4ff;text-decoration:none;font-weight:700;font-size:13px}
+main{flex:1;display:flex;min-height:0}
+#view{flex:1;position:relative;background:radial-gradient(circle at 50% 35%,#f7f9fc,#c9d3e0)}
+#view canvas{display:block;width:100%;height:100%}
+#tip{position:absolute;pointer-events:none;background:rgba(15,27,45,.92);color:#fff;border-radius:8px;padding:6px 10px;font-size:12px;display:none;max-width:260px}
+.cube{position:absolute;left:14px;top:14px;display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
+.cube button,.bar button{background:#fff;border:1px solid #b7c3d6;border-radius:7px;padding:6px 12px;font-weight:700;color:#1c2b44;cursor:pointer}
+.cube button:hover,.bar button:hover{background:#ff7a00;color:#fff;border-color:#ff7a00}
+.bar{position:absolute;left:14px;bottom:14px;right:14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;background:rgba(255,255,255,.85);border:1px solid #b7c3d6;border-radius:10px;padding:8px 12px}
+.bar label{display:flex;align-items:center;gap:6px;font-weight:700;font-size:13px}.bar input[type=range]{width:160px}
+aside{width:340px;background:#fff;border-left:1px solid #c6d0de;display:flex;flex-direction:column;min-height:0}
+aside h3{margin:0;padding:12px 14px 6px;font-size:12px;letter-spacing:1.2px;color:#5b6b82;text-transform:uppercase}
+#info{padding:6px 14px 12px;border-bottom:1px solid #e1e8f1;min-height:96px;font-size:13px}#info b{font-size:14px}
+#tree{overflow:auto;flex:1;padding:0 8px 10px}
+.grp{font-weight:800;font-size:12px;color:#34495e;margin:10px 6px 2px;text-transform:uppercase;letter-spacing:.8px}
+.row{display:flex;align-items:center;gap:8px;padding:4px 6px;border-radius:6px;cursor:pointer}.row:hover,.row.on{background:#fff1e3}
+.row i{width:12px;height:12px;border-radius:3px;border:1px solid rgba(0,0,0,.35);flex:none}.row span{flex:1;font-size:13px}
+.dl{padding:10px 14px;border-top:1px solid #e1e8f1;display:flex;gap:8px;flex-wrap:wrap}
+.dl a{background:#ff7a00;color:#fff;text-decoration:none;font-weight:800;padding:8px 12px;border-radius:8px;font-size:13px}.dl a.s{background:#eef2f8;color:#1c2b44}
+@media(max-width:860px){main{flex-direction:column}aside{width:auto;height:42%}}
+</style></head><body>
+<header><div class="num">06</div><div><h1>PUSTACHE SORTER · 3D MODEL</h1><p>Upgraded Tinkercad design · millimetres · drag to orbit, scroll to zoom, right-drag to pan</p></div><a href="../index.html">← All concepts</a></header>
+<main>
+<div id="view"><div id="tip"></div>
+<div class="cube"><button data-v="iso">Iso</button><button data-v="front">Front</button><button data-v="right">Right</button><button data-v="top">Top</button></div>
+<div class="bar"><label>Explode <input id="ex" type="range" min="0" max="100" value="0"></label><label><input id="gl" type="checkbox" checked> Glass parts</label><label><input id="ed" type="checkbox" checked> Edges</label><label><input id="gd" type="checkbox" checked> Grid</label><button id="hide">Show all</button></div></div>
+<aside><h3>Selected part</h3><div id="info"><i>Click a part in the model or in the list.</i></div><h3>Parts (<span id="n"></span>)</h3><div id="tree"></div>
+<div class="dl"><a href="downloads/Pustache_Sorter_assembly.stl" download>Assembly STL</a><a class="s" href="downloads/Pustache_Sorter_BOM.csv" download>BOM (CSV)</a></div></aside>
+</main>
+<script type="importmap">{"imports":{"three":"./vendor/three.module.min.js"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from './vendor/OrbitControls.js';
+const view = document.getElementById('view'), tip = document.getElementById('tip');
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); renderer.setPixelRatio(Math.min(2, devicePixelRatio)); view.prepend(renderer.domElement);
+const scene = new THREE.Scene(), cam = new THREE.PerspectiveCamera(32, 1, 5, 6000); cam.up.set(0, 0, 1);
+const ctl = new OrbitControls(cam, renderer.domElement); ctl.enableDamping = true;
+scene.add(new THREE.HemisphereLight(0xffffff, 0x8899aa, 1.05));
+const d1 = new THREE.DirectionalLight(0xffffff, 1.5); d1.position.set(600, -500, 900); scene.add(d1);
+const d2 = new THREE.DirectionalLight(0xffffff, .6); d2.position.set(-500, 600, 300); scene.add(d2);
+const grid = new THREE.GridHelper(1200, 24, 0x9aa8bb, 0xc3cddb); grid.rotation.x = Math.PI / 2; grid.position.set(220, 300, -0.5); scene.add(grid);
+const C = new THREE.Vector3(220, 300, 290), meshes = [], parts = [];
+const data = await (await fetch('parts.json')).json();
+for (const p of data) {
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(p.v, 3)); g.setIndex(p.f); g.computeVertexNormals();
+  const glass = p.alpha < 1, m = new THREE.MeshStandardMaterial({ color: p.color, metalness: .1, roughness: glass ? .2 : .55, transparent: glass, opacity: p.alpha, side: glass ? THREE.DoubleSide : THREE.FrontSide, depthWrite: !glass });
+  const mesh = new THREE.Mesh(g, m), eg = new THREE.LineSegments(new THREE.EdgesGeometry(g, 35), new THREE.LineBasicMaterial({ color: 0x1c2b44, transparent: true, opacity: .45 }));
+  const grp = new THREE.Group(); grp.add(mesh, eg); scene.add(grp);
+  g.computeBoundingBox(); const c = new THREE.Vector3(); g.boundingBox.getCenter(c);
+  const o = { p, grp, mesh, eg, c, glass, base: new THREE.Color(p.color) }; mesh.userData.o = o; parts.push(o); meshes.push(mesh);
+}
+document.getElementById('n').textContent = parts.length;
+const tree = document.getElementById('tree'), info = document.getElementById('info'); let sel = null;
+const groups = [...new Set(parts.map(o => o.p.group))];
+for (const gr of groups) {
+  const h = document.createElement('div'); h.className = 'grp'; h.textContent = gr; tree.append(h);
+  for (const o of parts.filter(o => o.p.group === gr)) {
+    const r = document.createElement('div'); r.className = 'row'; r.innerHTML = `<input type="checkbox" checked><i style="background:${o.p.color}"></i><span>${o.p.name}</span>`;
+    r.querySelector('input').onchange = e => { o.grp.visible = e.target.checked; e.stopPropagation(); }; r.querySelector('input').onclick = e => e.stopPropagation();
+    r.onclick = () => select(o); r.onmouseenter = () => hl(o, true); r.onmouseleave = () => hl(o, false); o.row = r; tree.append(r);
+  }
+}
+function hl(o, on) { o.mesh.material.emissive = new THREE.Color(on || o === sel ? 0xff7a00 : 0x000000); o.mesh.material.emissiveIntensity = on || o === sel ? .45 : 0; }
+function select(o) {
+  const prev = sel; sel = o; if (prev) { prev.row.classList.remove('on'); hl(prev, false); } if (o) { o.row.classList.add('on'); hl(o, true); o.row.scrollIntoView({ block: 'nearest' });
+    info.innerHTML = `<b>${o.p.name}</b><br>Group: ${o.p.group} · Qty: ${o.p.qty}<br>Make / buy: ${o.p.make}${o.p.note ? '<br><i>' + o.p.note + '</i>' : ''}`; }
+}
+// view presets
+const ctr = new THREE.Vector3(220, 300, 270), dist = 1500;
+const presets = { iso: [1, 1.15, .75], front: [0, 1, .05], right: [1, 0, .05], top: [0, .001, 1] };
+function setView(k) { const v = presets[k], n = new THREE.Vector3(...v).normalize(); cam.position.copy(ctr).addScaledVector(n, dist); ctl.target.copy(ctr); ctl.update(); }
+document.querySelectorAll('.cube button').forEach(b => b.onclick = () => setView(b.dataset.v)); setView('iso');
+// toggles
+const ex = document.getElementById('ex');
+function explode() { const k = ex.value / 100 * .7; for (const o of parts) { const off = o.c.clone().sub(C); off.z *= 1.6; o.grp.position.copy(off.multiplyScalar(k)); } }
+ex.oninput = explode;
+document.getElementById('gl').onchange = e => { for (const o of parts) if (o.glass) o.grp.visible = e.target.checked && o.row.querySelector('input').checked; };
+document.getElementById('ed').onchange = e => { for (const o of parts) o.eg.visible = e.target.checked; };
+document.getElementById('gd').onchange = e => { grid.visible = e.target.checked; };
+document.getElementById('hide').onclick = () => { for (const o of parts) { o.grp.visible = true; o.row.querySelector('input').checked = true; } };
+// picking
+const ray = new THREE.Raycaster(), mouse = new THREE.Vector2(); let hover = null, down = null;
+renderer.domElement.addEventListener('pointermove', e => {
+  const r = renderer.domElement.getBoundingClientRect(); mouse.set((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1); ray.setFromCamera(mouse, cam);
+  const vis = meshes.filter(m => m.parent.visible), hit = ray.intersectObjects(vis)[0], o = hit ? hit.object.userData.o : null;
+  if (hover !== o) { if (hover) hl(hover, false); hover = o; if (o) hl(o, true); }
+  if (o) { tip.style.display = 'block'; tip.style.left = (e.clientX - r.left + 14) + 'px'; tip.style.top = (e.clientY - r.top + 10) + 'px'; tip.textContent = o.p.name; } else tip.style.display = 'none';
+});
+renderer.domElement.addEventListener('pointerdown', e => { down = [e.clientX, e.clientY]; });
+renderer.domElement.addEventListener('pointerup', e => { if (down && Math.hypot(e.clientX - down[0], e.clientY - down[1]) < 4) select(hover); down = null; });
+function resize() { const w = view.clientWidth, h = view.clientHeight; renderer.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); }
+new ResizeObserver(resize).observe(view); resize();
+(function loop() { ctl.update(); renderer.render(scene, cam); requestAnimationFrame(loop); })();
+window.__ready = true;
+</script></body></html>

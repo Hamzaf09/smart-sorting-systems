@@ -22,3 +22,6 @@ Serve the repository root with any static host (Cloudflare Pages: build command 
 - `sim/` - shared `engine.js` (isometric canvas engine + UI shell), `sim.css`, one `*.js` + `*.html` per concept
 - `renders/` - static labelled isometric renders (SVG + PNG)
 - `src/` - Python generator for the static renders (optional, not needed to run the site)
+
+## 3D model (Pustache Sorter)
+`3d/pustache.html` is an interactive 3D viewer (orbit, explode, parts list). `3d/downloads/` has the assembly STL, 30 per-part STLs and a BOM CSV; import into Fusion 360 / Tinkercad. Regenerate with `python3 src/pustache_cad.py` (numpy only). Units: mm, Z up.
