@@ -40,7 +40,7 @@ Everything marked (?) could not be confirmed from the screenshots and needs a ch
 | Decision | Why |
 |---|---|
 | Keep the red backboard + 3 shelves + tube + chute + 4 cups | Student team already modelled it; gravity layout is the simplest reliable transport |
-| Add **two small flap gates** in the tube (G0 meter, G1 inspection stop) | Releases exactly one object at a time; both are plain SG90/MG90S servos with a flap |
+| Add a **two-pin escapement (G0)** at the tube bottom and a **flap gate G1** under the inspection chamber | A plain flap would drop the whole queue; the rocker holds object #2 with pin 2 while pin 1 lets #1 fall, so exactly one object is released. G1 holds it for the scan |
 | Add **inspection chamber** between G0 and G1 (black/white matte box, LED strip, window for camera) | Same lighting and distance every time = reliable OpenCV colour |
 | Add **IR break-beam** across the chamber | Proves "object entered", starts the scan, detects jams (G0 opened but no beam break) |
 | Make the chute a **swing chute on one servo** (S2), cups on an arc under its outlet | One moving part decides the bin; no belts, no arm |
@@ -104,7 +104,7 @@ vote: >= 4/5 frames agree AND area ratio >= 0.60 AND second colour < 0.15
 ## 9. Step-by-step operation
 1. READY: G0 closed, G1 closed, chute at HOME, LEDs on.
 2. Operator drops objects in the tube (several allowed); they queue above G0.
-3. Arduino opens G0 for 0.4 s; exactly one object drops into the chamber and rests on G1.
+3. Arduino swings the G0 escapement (pin 1 out, pin 2 pinches the next object): exactly one object drops into the chamber and rests on G1; the pins swap back.
 4. IR beam breaks: "object entered" -> Arduino tells Pi `SCAN`. No beam break within 1 s of G0 opening = JAM alarm.
 5. Pi captures 5 frames, classifies, decides, sends `C:R` (or G / B / X).
 6. Arduino turns S2 to the arc angle of that bin (RED 25 deg, GREEN 65, BLUE 105, REJECT 145 - tune).

@@ -9,6 +9,7 @@ Five original smart sorting concepts, each with a labelled isometric render and 
 | 03 | TiltSort Arena - servo-tilted plate with PD control | `sim/tiltsort.html` |
 | 04 | TriSense Line - conveyor with colour / height / metal fusion and pushers | `sim/trisense.html` |
 | 05 | Cascade Tower - screw lift, scan chamber, servo flap tree | `sim/cascade.html` |
+| 06 | Pustache Sorter - upgraded Tinkercad design: escapement, lit chamber, reject cup, swing chute | `sim/pustache.html` |
 
 Open `index.html` for the report and links to every simulation.
 
