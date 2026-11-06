@@ -27,7 +27,7 @@ class Iso {
     const b = this.bounds, xs = [], ys = [];
     for (const X of b.x) for (const Y of b.y) for (const Z of b.z) { xs.push((X - Y) * C30); ys.push((X + Y) * S5 - Z); }
     const minx = Math.min(...xs), maxx = Math.max(...xs), miny = Math.min(...ys), maxy = Math.max(...ys), m = this.margin;
-    this.k = Math.min((this.W - m.l - m.r) / (maxx - minx), (this.H - m.t - m.b) / (maxy - miny));
+    this.k = Math.max(.5, Math.min((this.W - m.l - m.r) / (maxx - minx), (this.H - m.t - m.b) / (maxy - miny)));
     this.ox = m.l + (this.W - m.l - m.r) / 2 - this.k * (minx + maxx) / 2;
     this.oy = m.t + (this.H - m.t - m.b) / 2 - this.k * (miny + maxy) / 2;
     this.modelX = [this.ox + this.k * minx, this.ox + this.k * maxx];
